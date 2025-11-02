@@ -1,18 +1,35 @@
 import { useLocalSearchParams } from "expo-router";
-import React from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { pets } from "../data/pets";
+import { getPet } from "../api/pet";
+import { Pet } from "../data/pets";
 
 export default function PetDetails() {
   const { id } = useLocalSearchParams();
+  console.log(id);
+  const [pet, setPet] = useState<Pet | null>(null);
+  const onePet = async () => {
+    const pet = await getPet(id as string);
+    setPet(pet);
+  };
 
-  const pet = pets.find((p) => p.id === Number(id));
+  // const pet = pets.find((p) => p.id === Number(id));
 
   if (!pet) {
     return (
       <SafeAreaView style={styles.container} edges={["bottom"]}>
         <View style={styles.errorContainer}>
+          <TouchableOpacity onPress={() => onePet()}>
+            <Text>Get Pet</Text>
+          </TouchableOpacity>
           <Text style={styles.errorText}>Pet not found!</Text>
         </View>
       </SafeAreaView>

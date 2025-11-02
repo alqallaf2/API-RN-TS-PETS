@@ -5,7 +5,7 @@ export const getPets = async () => {
   return response.data;
 };
 
-// export const getPet = async (id: string) => {
-//   const response = await api.get(`/pets/${id}`);
-//   return response.data;
-// };
+export const getPet = async (id: string) => {
+  const response = await api.get(`/pets/${id}`);
+  return response.data;
+};
