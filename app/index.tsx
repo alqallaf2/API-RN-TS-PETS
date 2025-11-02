@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getPets } from "../api/pet";
 import { AddPetModal } from "../components/AddPetModal";
 import { PetCard } from "../components/PetCard";
 import { pets as initialPets, Pet } from "../data/pets";
@@ -24,7 +25,11 @@ export default function Index() {
   const handleAddPet = (newPet: Pet) => {
     setPets([newPet, ...pets]);
   };
-
+  function fetchPets() {
+    getPets().then((data) => {
+      setPets(data);
+    });
+  }
   return (
     <>
       <TouchableOpacity
@@ -32,6 +37,10 @@ export default function Index() {
         style={styles.headerButton}
       >
         <Text style={styles.headerButtonText}>Add Pet</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => fetchPets()} style={styles.headerButton}>
+        <Text style={styles.headerButtonText}>Get All Pets</Text>
       </TouchableOpacity>
 
       <SafeAreaView style={styles.container} edges={["bottom"]}>
