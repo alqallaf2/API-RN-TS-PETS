@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -30,6 +31,11 @@ export default function Index() {
       setPets(data);
     });
   }
+  const { data, refetch } = useQuery({
+    queryKey: ["pets"],
+    queryFn: getPets,
+  });
+
   return (
     <>
       <TouchableOpacity
@@ -51,7 +57,7 @@ export default function Index() {
               <Text style={styles.emptySubtext}>Start by adding a new pet</Text>
             </View>
           ) : (
-            pets.map((pet) => (
+            data?.map((pet: Pet) => (
               <PetCard
                 key={pet.id}
                 pet={pet}

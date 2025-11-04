@@ -1,3 +1,5 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -9,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { addPet } from "../api/pet";
 import { Pet } from "../data/pets";
 
 interface AddPetModalProps {
@@ -26,25 +29,14 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({
   const [type, setType] = useState("");
   const [adopted, setAdopted] = useState("");
   const [image, setImage] = useState("");
-
-  const handleAdd = () => {
-    if (name.trim() && type.trim()) {
-      const maxId = Date.now(); // Generate unique ID using rtimestamp
-      onAdd({
-        id: maxId,
-        name: name.trim(),
-        type: type.trim(),
-        adopted: adopted.trim() || "No",
-        image: image.trim() || "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=400&fit=crop",
-      });
-      // Reset form
-      setName("");
-      setType("");
-      setAdopted("");
-      setImage("");
-      onClose();
-    }
-  };
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: () => addPet(name, image, type, adopted),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pets"] });
+      router.back();
+    },
+  });
 
   const handleCancel = () => {
     setName("");
@@ -125,7 +117,7 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, styles.addButton]}
-              onPress={handleAdd}
+              onPress={() => mutate()}
               disabled={!name.trim() || !type.trim()}
             >
               <Text style={styles.addButtonText}>Add Pet</Text>
@@ -216,4 +208,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

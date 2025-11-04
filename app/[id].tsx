@@ -1,4 +1,5 @@
-import { useLocalSearchParams } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
@@ -9,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getPet } from "../api/pet";
+import { deletePet, getPet } from "../api/pet";
 import { Pet } from "../data/pets";
 
 export default function PetDetails() {
@@ -20,8 +21,14 @@ export default function PetDetails() {
     const pet = await getPet(id as string);
     setPet(pet);
   };
-
   // const pet = pets.find((p) => p.id === Number(id));
+  const { mutate } = useMutation({
+    mutationKey: ["deletPet", id],
+    mutationFn: () => deletePet(id as string),
+    onSuccess: () => {
+      router.replace("/");
+    },
+  });
 
   if (!pet) {
     return (
@@ -31,11 +38,13 @@ export default function PetDetails() {
             <Text>Get Pet</Text>
           </TouchableOpacity>
           <Text style={styles.errorText}>Pet not found!</Text>
+          <TouchableOpacity onPress={() => mutate()}>
+            <Text>Delete Pet</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
-
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
       <ScrollView contentContainerStyle={styles.content}>
